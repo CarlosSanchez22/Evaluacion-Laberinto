@@ -22,9 +22,7 @@
     <canvas id="mycanvas" width="1200" height="600"></canvas>
 
     <script type="">
-      setTimeout(function () {
-        location.reload();
-      }, 1000); // 60,000 milisegundos = 60 segundos
+
 
       const mycanvas = document.getElementById("mycanvas");
       const ctx = mycanvas.getContext("2d");
@@ -39,8 +37,10 @@
       SongGame.loop = true;
       SongGame.controls = true;
 
+      const SongPuerta = new Audio("SonidoPuerta.mp3");
+
       const playerImage = new Image();
-      playerImage.src = "Fantasma.png";
+      playerImage.src = "fantasma.gif";
 
       const puertaImage = new Image();
       puertaImage.src = "Puerta.gif";
@@ -73,6 +73,7 @@
       var salida = new Objetos("#db0000", 40, 40, 1140, 560);
 
       //Paredes laberinto
+      //                               Ancho largo  x  y
       //Bordes
       paredes.push(new Objetos("purple", 20, 600, 0, 0));
       paredes.push(new Objetos("purple", 20, 600, 1180, 0));
@@ -90,16 +91,34 @@
       paredes.push(new Objetos("purple", 20, 70, 130, 455));
       paredes.push(new Objetos("purple", 20, 125, 200, 455));
       paredes.push(new Objetos("purple", 20, 90, 130, 365));
+      paredes.push(new Objetos("purple", 20, 295, 320, 90));
+      paredes.push(new Objetos("purple", 20, 63, 130, 235));
+      paredes.push(new Objetos("purple", 20, 333, 400, 173));
+      paredes.push(new Objetos("purple", 20, 245, 570, 90));
+      paredes.push(new Objetos("purple", 20, 233, 485, 173));
+      paredes.push(new Objetos("purple", 20, 315, 655, 90));
+      paredes.push(new Objetos("purple", 20, 275, 1090, 235));
+      paredes.push(new Objetos("purple", 20, 185, 750, 235));
+      paredes.push(new Objetos("purple", 20, 185, 840, 175));
+      paredes.push(new Objetos("purple", 20, 185, 930, 235));
+      paredes.push(new Objetos("purple", 20, 225, 1000, 175));
 
 
       //Acostado
-      paredes.push(new Objetos("purple", 200, 20, 80, 285));
+      paredes.push(new Objetos("purple", 180, 20, 80, 285));
       paredes.push(new Objetos("purple", 70, 20, 80, 455));
-      paredes.push(new Objetos("purple", 180, 20, 130, 365));
+      paredes.push(new Objetos("purple", 190, 20, 130, 365));
       paredes.push(new Objetos("purple", 180, 20, 140, 90));
       paredes.push(new Objetos("purple", 180, 20, 140, 153));
       paredes.push(new Objetos("purple", 180, 20, 390, 90));
-      
+      paredes.push(new Objetos("purple", 115, 20, 220, 455));
+      paredes.push(new Objetos("purple", 100, 20, 320, 245));
+      paredes.push(new Objetos("purple", 185, 20, 485, 400));
+      paredes.push(new Objetos("purple", 85, 20, 305, 90));
+      paredes.push(new Objetos("purple", 595, 20, 400, 485));
+      paredes.push(new Objetos("purple", 425, 20, 670, 400));
+      paredes.push(new Objetos("purple", 435, 20, 745, 155));
+      paredes.push(new Objetos("purple", 435, 20, 655, 85));
 
       // Movimiento
       document.addEventListener("keypress", function (e) {
@@ -151,6 +170,7 @@
             score++;
             speed++;
             SongGame.play();
+            SongPuerta.play();
             player.x = 20;
             player.y = 20;
             player.w = 40;
@@ -207,7 +227,7 @@
         ctx.fillStyle = salida.color;
         ctx.drawImage(puertaImage, salida.x, salida.y, salida.w, salida.h);
 
-        //ctx.drawImage(puertaImage, 100, 100, 30, 30);
+        
         update();
         requestAnimationFrame(pintar);
       }
