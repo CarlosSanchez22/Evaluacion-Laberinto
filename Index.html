@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laberinto</title>
+    <style>
+      body {
+        background: linear-gradient(to top, #100055, #8a2be2, #800880, #020269);
+        display: flex;
+        justify-content: center; /* Centra horizontalmente */
+        align-items: center; /* Centra verticalmente */
+        height: 100vh; /* Ocupa el 100% de la altura de la ventana */
+        margin: 0;
+      }
+      canvas {
+        display: block; /* Evita espacio debajo del canvas */
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="mycanvas" width="1200" height="600"></canvas>
+
+    <script type="">
+      /*setTimeout(function () {
+        location.reload();
+      }, 1000); // 60,000 milisegundos = 60 segundos*/
+
+      const mycanvas = document.getElementById("mycanvas");
+      const ctx = mycanvas.getContext("2d");
+
+      var direction = "";
+      var speed = 2;
+      var score = 0;
+      var pausa = false;
+      var paredes = [];
+
+      const SongGame = new Audio("Halloween.mp3");
+      SongGame.loop = true;
+      SongGame.controls = true;
+
+      const playerImage = new Image();
+      playerImage.src = "Fantasma.png";
+
+      const puertaImage = new Image();
+      puertaImage.src = "Puerta.gif";
+
+      class Objetos {
+        constructor(color, w, h, x, y, speed) {
+          this.color = color;
+          this.w = w;
+          this.h = h;
+          this.x = x;
+          this.y = y;
+          this.speed = speed;
+        }
+
+        colision(move) {
+          if (
+            this.x < move.x + move.w &&
+            this.x + this.w > move.x &&
+            this.y < move.y + move.h &&
+            this.y + this.h > move.y
+          ) {
+            return true;
+          }
+          return false;
+        }
+      }
+
+      //Jugador
+      var player = new Objetos("#db0000", 40, 40, 20, 20, 5);
+      var salida = new Objetos("#db0000", 40, 40, 1140, 560);
+
+      //Paredes laberinto
+      //                               Ancho largo  x  y
+      //Bordes
+      paredes.push(new Objetos("purple", 20, 600, 0, 0));
+      paredes.push(new Objetos("purple", 20, 600, 1180, 0));
+      paredes.push(new Objetos("purple", 1119, 20, 20, 580));
+      paredes.push(new Objetos("purple", 1100, 20, 80, 0));
+
+      //Obstaculos
+      paredes.push(new Objetos("purple", 50, 20, 20, 153));
+      paredes.push(new Objetos("purple", 20, 110, 60, 0));
+      paredes.push(new Objetos("purple", 200, 20, 60, 216));
+
+      paredes.push(new Objetos("purple", 20, 110, 60, 285));
+      paredes.push(new Objetos("purple", 20, 70, 60, 455));
+      paredes.push(new Objetos("purple", 20, 70, 130, 455));
+      paredes.push(new Objetos("purple", 20, 125, 200, 455));
+
+      paredes.push(new Objetos("purple", 200, 20, 80, 285));
+      //paredes.push(new Objetos("purple", 200, 20, 80, 285));
+
+      // Movimiento
+      document.addEventListener("keypress", function (e) {
+        switch (e.keyCode) {
+          case 119: //87
+            direction = "up";
+            break;
+          case 115: //83
+            direction = "down";
+            break;
+          case 97: //65
+            direction = "left";
+            break;
+          case 100: //68
+            direction = "right";
+            break;
+          case 32:
+            pausa = !pausa;
+            break;
+        }
+      });
+
+      function update() {
+        if (!pausa) {
+          SongGame.play();
+          switch (direction) {
+            case "up":
+              player.y -= speed;
+              if (player.y < 0) player.y = 0;
+              break;
+            case "down":
+              player.y += speed;
+              if (player.y + player.h > mycanvas.height)
+                player.y = mycanvas.height - player.h;
+              break;
+            case "right":
+              player.x += speed;
+              if (player.x + player.w > mycanvas.width)
+                player.x = mycanvas.width - player.w;
+              break;
+            case "left":
+              player.x -= speed;
+              if (player.x < 0) player.x = 0;
+              break;
+          }
+
+          //POR SI PLAYER TOCA LA PUERTA
+          if (player.colision(salida)) {
+            score++;
+            speed++;
+            SongGame.play();
+            player.x = 20;
+            player.y = 20;
+            player.w = 40;
+            player.h = 40;
+          }
+
+          paredes.forEach(function (paredes) {
+            if (player.colision(paredes)) {
+              switch (direction) {
+                case "up":
+                  player.y += speed;
+                  break;
+                case "down":
+                  player.y -= speed;
+                  break;
+                case "right":
+                  player.x -= speed;
+                  break;
+                case "left":
+                  player.x += speed;
+                  break;
+              }
+            }
+          });
+        }
+      }
+
+      const gifImage = new Image();
+      gifImage.src = "FondoCalabaza.gif";
+
+      function pintar() {
+        ctx.drawImage(gifImage, 0, 0, mycanvas.width, mycanvas.height);
+
+        if (pausa) {
+          ctx.fillStyle = "rgba(163, 0, 54, 0.79)";
+          ctx.fillRect(0, 0, 1200, 600);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "80px Arial";
+          ctx.fillText("P A U S E", 400, 300);
+        }
+
+        ctx.font = "35px Arial";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("Score: " + score, 1000, 65);
+
+        ctx.drawImage(playerImage, player.x, player.y, player.w, player.h);
+
+        paredes.forEach(function (paredes) {
+          ctx.fillStyle = paredes.color;
+          ctx.fillRect(paredes.x, paredes.y, paredes.w, paredes.h);
+          ctx.strokeRect(paredes.x, paredes.y, paredes.w, paredes.h);
+        });
+
+        ctx.fillStyle = salida.color;
+        ctx.drawImage(puertaImage, salida.x, salida.y, salida.w, salida.h);
+
+        //ctx.drawImage(puertaImage, 100, 100, 30, 30);
+        update();
+        requestAnimationFrame(pintar);
+      }
+      requestAnimationFrame(pintar);
+
+      window.requestAnimationFrame = (function () {
+        return (
+          window.requestAnimationFrame ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          function (callback) {
+            window.setTimeout(callback, 17);
+          }
+        );
+      })();
+    </script>
+  </body>
+</html>
