@@ -21,9 +21,7 @@
   <body>
     <canvas id="mycanvas" width="1200" height="600"></canvas>
 
-    <script type="">
-
-
+    <script type="text/javascript">
       const mycanvas = document.getElementById("mycanvas");
       const ctx = mycanvas.getContext("2d");
 
@@ -33,9 +31,37 @@
       var pausa = false;
       var paredes = [];
 
+      var timeElapsed = 0;
+      var timerInterval;
+      var timerRunning = false; // Para controlar si el temporizador ya ha comenzado
+      var playerMoved = false; // Verifica si el jugador ya se ha movido
+
+      function startTimer() {
+        timerInterval = setInterval(function () {
+          timeElapsed++;
+        }, 1000);
+        timerRunning = true; // Indicar que el temporizador está corriendo
+      }
+
+      function stopTimer() {
+        clearInterval(timerInterval);
+        timerRunning = false; // Indicar que el temporizador está detenido
+      }
+
+      function togglePause() {
+        pausa = !pausa;
+
+        if (pausa) {
+          stopTimer();
+        } else {
+          if (!timerRunning && playerMoved) {
+            startTimer(); // Reanudar si ya empezó y el jugador se ha movido
+          }
+        }
+      }
+
       const SongGame = new Audio("Halloween.mp3");
       SongGame.loop = true;
-      SongGame.controls = true;
 
       const SongPuerta = new Audio("SonidoPuerta.mp3");
 
@@ -56,36 +82,32 @@
         }
 
         colision(move) {
-          if (
+          return (
             this.x < move.x + move.w &&
             this.x + this.w > move.x &&
             this.y < move.y + move.h &&
             this.y + this.h > move.y
-          ) {
-            return true;
-          }
-          return false;
+          );
         }
       }
 
-      //Jugador
+      // Jugador
       var player = new Objetos("#db0000", 40, 40, 20, 20, 5);
       var salida = new Objetos("#db0000", 40, 40, 1140, 560);
 
-      //Paredes laberinto
-      //                               Ancho largo  x  y
-      //Bordes
+      // Paredes laberinto
+      // Bordes
       paredes.push(new Objetos("purple", 20, 600, 0, 0));
       paredes.push(new Objetos("purple", 20, 600, 1180, 0));
       paredes.push(new Objetos("purple", 1119, 20, 20, 580));
       paredes.push(new Objetos("purple", 1100, 20, 80, 0));
 
-      //Obstaculos
+      // Obstáculos
       paredes.push(new Objetos("purple", 50, 20, 20, 153));
       paredes.push(new Objetos("purple", 20, 110, 60, 0));
       paredes.push(new Objetos("purple", 200, 20, 60, 216));
 
-      //                               Ancho largo  x  y
+      
       paredes.push(new Objetos("purple", 20, 110, 60, 285));
       paredes.push(new Objetos("purple", 20, 70, 60, 455));
       paredes.push(new Objetos("purple", 20, 70, 130, 455));
@@ -103,8 +125,7 @@
       paredes.push(new Objetos("purple", 20, 185, 930, 235));
       paredes.push(new Objetos("purple", 20, 225, 1000, 175));
 
-
-      //Acostado
+      // Acostado
       paredes.push(new Objetos("purple", 180, 20, 80, 285));
       paredes.push(new Objetos("purple", 70, 20, 80, 455));
       paredes.push(new Objetos("purple", 190, 20, 130, 365));
@@ -122,6 +143,11 @@
 
       // Movimiento
       document.addEventListener("keypress", function (e) {
+        if (!playerMoved) {
+          startTimer(); // Iniciar temporizador cuando el jugador se mueva por primera vez
+          playerMoved = true;
+        }
+
         switch (e.keyCode) {
           case 119: //87
             direction = "up";
@@ -136,14 +162,15 @@
             direction = "right";
             break;
           case 32:
-            pausa = !pausa;
+            togglePause();
             break;
         }
       });
 
       function update() {
         if (!pausa) {
-          SongGame.play();
+          SongGame.play(); // Mueve esta línea fuera del bloque if para evitar múltiples llamadas
+
           switch (direction) {
             case "up":
               player.y -= speed;
@@ -165,11 +192,10 @@
               break;
           }
 
-          //POR SI PLAYER TOCA LA PUERTA
+          // Si el jugador toca la puerta
           if (player.colision(salida)) {
             score++;
             speed++;
-            SongGame.play();
             SongPuerta.play();
             player.x = 20;
             player.y = 20;
@@ -213,8 +239,9 @@
         }
 
         ctx.font = "35px Arial";
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText("Score: " + score, 1000, 65);
+        ctx.fillStyle = "#fe0f0f";
+        ctx.fillText("Score: " + score, 570, 65);
+        ctx.fillText("Tiempo: " + timeElapsed + "s", 940, 65);
 
         ctx.drawImage(playerImage, player.x, player.y, player.w, player.h);
 
@@ -227,7 +254,8 @@
         ctx.fillStyle = salida.color;
         ctx.drawImage(puertaImage, salida.x, salida.y, salida.w, salida.h);
 
-        
+
+
         update();
         requestAnimationFrame(pintar);
       }
