@@ -107,7 +107,7 @@
       paredes.push(new Objetos("purple", 20, 110, 60, 0));
       paredes.push(new Objetos("purple", 200, 20, 60, 216));
 
-      
+
       paredes.push(new Objetos("purple", 20, 110, 60, 285));
       paredes.push(new Objetos("purple", 20, 70, 60, 455));
       paredes.push(new Objetos("purple", 20, 70, 130, 455));
@@ -230,13 +230,7 @@
       function pintar() {
         ctx.drawImage(gifImage, 0, 0, mycanvas.width, mycanvas.height);
 
-        if (pausa) {
-          ctx.fillStyle = "rgba(163, 0, 54, 0.79)";
-          ctx.fillRect(0, 0, 1200, 600);
-          ctx.fillStyle = "#ffffff";
-          ctx.font = "80px Arial";
-          ctx.fillText("P A U S E", 400, 300);
-        }
+
 
         ctx.font = "35px Arial";
         ctx.fillStyle = "#fe0f0f";
@@ -254,6 +248,13 @@
         ctx.fillStyle = salida.color;
         ctx.drawImage(puertaImage, salida.x, salida.y, salida.w, salida.h);
 
+        if (pausa) {
+          ctx.fillStyle = "rgba(163, 0, 54, 0.79)";
+          ctx.fillRect(0, 0, 1200, 600);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "80px Arial";
+          ctx.fillText("P A U S E", 400, 300);
+        }
 
 
         update();
